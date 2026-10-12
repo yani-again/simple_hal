@@ -25,3 +25,5 @@ Since this is intended for simple projects, it is not going to be a piece of cod
 If your project doesn't involve many parts, or you're just testing, this is mostly fine can you can use it without issue.
 
 If you need something more, alternatives are the way to go!
+
+Additionally, this library relies on CMSIS *(CMSIS 6 as of writing)* and the relevant device headers from STMicroelectronics to be present, otherwise things like register names will not be found.
