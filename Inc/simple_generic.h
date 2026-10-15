@@ -2,6 +2,9 @@
 #define SIMPLE_GENERIC_H
 
 
+#include <stdbool.h>
+
+
 typedef enum
 {
     simple_OK   = 0,
