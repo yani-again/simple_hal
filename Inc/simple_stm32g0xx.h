@@ -4,6 +4,7 @@
 
 #include "simple_generic.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 
 /* oscillators */
@@ -32,16 +33,25 @@ typedef struct
     simple_clock source;
     // bool enableAlarmA; TODO: alarms
     // bool enableAlarmB;
-} simple_rcc_config_t;
+    uint8_t startDate[6];  // expected in string format "DDMMYY"
+    uint8_t startTime[6];  // expected in string format "HHMMSS"
+} simple_rtc_config_t;
+
+typedef struct
+{
+    uint8_t date[6];
+    uint8_t time[6];
+} simple_rtc_currentTime;
 
 
 /* clock functions */
 simple_returnStatus simple_clock_configureLse(simple_clock_lseConfig_t*);
 
 /* RTC functions */
-simple_returnStatus simple_rtc_configure(simple_rcc_config_t*);
+simple_returnStatus simple_rtc_configure(simple_rtc_config_t*);
 void simple_rtc_writeProtectionDisable(void);
 void simple_rtc_writeProtectionEnable(void);
+void simple_rtc_getTime(simple_rtc_currentTime*);
 
 
 #endif
