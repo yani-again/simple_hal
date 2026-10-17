@@ -88,6 +88,13 @@ simple_returnStatus simple_rtc_configure(simple_rtc_config_t *configuration)
         RCC->APBENR1 |= RCC_APBENR1_PWREN;
     }
 
+    PWR->CR1 |= PWR_CR1_DBP;
+    while (!(PWR->CR1 & PWR_CR1_DBP))
+        ;
+
+    RTC->WPR = 0xCA;
+    RTC->WPR = 0x53;
+
     // enter init mode
     RTC->ICSR |= RTC_ICSR_INIT;
     while (!(RTC->ICSR & RTC_ICSR_INITF))
@@ -104,6 +111,12 @@ simple_returnStatus simple_rtc_configure(simple_rtc_config_t *configuration)
 
             if (prediv_s > RTC_PREDIV_S_MAX)
                 return simple_ERR;
+
+            // select LSE as clock source
+            uint32_t tmp = RCC->BDCR;
+            tmp &= ~RCC_BDCR_RTCSEL_Msk;
+            tmp |= 1 << RCC_BDCR_RTCSEL_Pos;
+            RCC->BDCR = tmp;
             break;
         // TODO: handle other oscillators
         default:
@@ -143,12 +156,23 @@ simple_returnStatus simple_rtc_configure(simple_rtc_config_t *configuration)
     // configure RTC to use 24-hour mode
     RTC->CR &= ~RTC_CR_FMT;
 
+    // enable/disable RTC
+    if (configuration->enable)
+        RCC->BDCR |= RCC_BDCR_RTCEN;
+    else
+        RCC->BDCR &= ~RCC_BDCR_RTCEN;
+
     /* RM0444 mentioned this bit is cleared by hardware or software, I rather do it in software
      * to not rely on the hardware as it seemed a bit unclear */
     RTC->ICSR &= ~RTC_ICSR_RSF;
 
     // exit init mode
     RTC->ICSR &= ~RTC_ICSR_INIT;
+
+    RTC->WPR = 0xFF;
+    PWR->CR1 &= ~PWR_CR1_DBP;
+    if (disable_pwr == true)
+        RCC->APBENR1 &= ~RCC_APBENR1_PWREN;
 
     return simple_OK;
 }
@@ -173,11 +197,6 @@ void simple_rtc_writeProtectionEnable(void)
  */
 void simple_rtc_getTime(simple_rtc_currentTime* currentTime)
 {
-    // wait for shadow register sync
-    while (!(RTC->ICSR & RTC_ICSR_RSF))
-        ;
-    RTC->ICSR &= ~RTC_ICSR_RSF;
-
     uint32_t time_register = RTC->TR;
     uint32_t date_register = RTC->DR;
 
