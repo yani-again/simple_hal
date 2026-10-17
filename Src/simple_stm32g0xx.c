@@ -181,5 +181,22 @@ void simple_rtc_getTime(simple_rtc_currentTime* currentTime)
     uint32_t time_register = RTC->TR;
     uint32_t date_register = RTC->DR;
 
-    // TODO: process register contents and store them in currentTime fields
+    // hour
+    currentTime->time[0] = (time_register & RTC_TR_HT_Msk) >> RTC_TR_HT_Pos;
+    currentTime->time[1] = (time_register & RTC_TR_HU_Msk) >> RTC_TR_HU_Pos;
+    // minute
+    currentTime->time[2] = (time_register & RTC_TR_MNT_Msk) >> RTC_TR_MNT_Pos;
+    currentTime->time[3] = (time_register & RTC_TR_MNU_Msk) >> RTC_TR_MNU_Pos;
+    // second
+    currentTime->time[4] = (time_register & RTC_TR_ST_Msk) >> RTC_TR_ST_Pos;
+    currentTime->time[5] = (time_register & RTC_TR_SU_Msk) >> RTC_TR_SU_Pos;
+    // day
+    currentTime->date[0] = (date_register & RTC_DR_DT_Msk) >> RTC_DR_DT_Pos;
+    currentTime->date[1] = (date_register & RTC_DR_DU_Msk) >> RTC_DR_DU_Pos;
+    // month
+    currentTime->date[2] = (date_register & RTC_DR_MT_Msk) >> RTC_DR_MT_Pos;
+    currentTime->date[3] = (date_register & RTC_DR_MU_Msk) >> RTC_DR_MU_Pos;
+    // year
+    currentTime->date[4] = (date_register & RTC_DR_YT_Msk) >> RTC_DR_YT_Pos;
+    currentTime->date[5] = (date_register & RTC_DR_YU_Msk) >> RTC_DR_YU_Pos;
 }

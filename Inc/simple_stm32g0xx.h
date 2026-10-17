@@ -39,8 +39,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t date[6];
-    uint8_t time[6];
+    uint8_t date[6];    // expected in string format "DDMMYY"
+    uint8_t time[6];    // expected in string format "HHMMSS"
 } simple_rtc_currentTime;
 
 
