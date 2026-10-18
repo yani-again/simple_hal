@@ -92,14 +92,6 @@ simple_returnStatus simple_rtc_configure(simple_rtc_config_t *configuration)
     while (!(PWR->CR1 & PWR_CR1_DBP))
         ;
 
-    RTC->WPR = 0xCA;
-    RTC->WPR = 0x53;
-
-    // enter init mode
-    RTC->ICSR |= RTC_ICSR_INIT;
-    while (!(RTC->ICSR & RTC_ICSR_INITF))
-        ;
-
     uint32_t prediv_a, prediv_s;
     // TODO: check that  fPCLK >= 2 * fRTCCLK
     switch (configuration->source)
@@ -128,6 +120,14 @@ simple_returnStatus simple_rtc_configure(simple_rtc_config_t *configuration)
     prediv_s &= RTC_PRER_PREDIV_S_Msk;
 
     RTC->PRER = prediv_a | prediv_s;
+
+    RTC->WPR = 0xCA;
+    RTC->WPR = 0x53;
+
+    // enter init mode
+    RTC->ICSR |= RTC_ICSR_INIT;
+    while (!(RTC->ICSR & RTC_ICSR_INITF))
+        ;
 
     /* start time */
     RTC->TR = 0;
