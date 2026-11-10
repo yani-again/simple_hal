@@ -354,3 +354,11 @@ void simple_gpio_portEnableDisable(uint8_t port, bool enable)
 
     return;
 }
+
+void simple_gpio_portReset(uint8_t port)
+{
+    // STM32G031K8 only has GPIO ports A, B, C, D, and F
+    assert((port >= 'A' && port <= 'D') || port == 'F');
+
+    // TODO: resert port with RCC_IOPRSTR
+}

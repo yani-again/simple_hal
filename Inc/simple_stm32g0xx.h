@@ -117,6 +117,7 @@ void simple_rtc_getTime(simple_rtc_currentTime*);
 /* GPIO functions */
 simple_returnStatus simple_gpio_configure(simple_gpio_typeDef*, simple_gpio_config_t*);
 void simple_gpio_portEnableDisable(uint8_t, bool);
+void simple_gpio_portReset(uint8_t);
 
 
 #endif
