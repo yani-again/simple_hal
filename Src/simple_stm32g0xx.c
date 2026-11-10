@@ -342,10 +342,15 @@ void simple_gpio_portEnableDisable(uint8_t port, bool enable)
     // STM32G031K8 only has GPIO ports A, B, C, D, and F
     assert((port >= 'A' && port <= 'D') || port == 'F');
 
+    volatile uint32_t tmp;
+
     if (enable == true)
         RCC->IOPENR |= 1 << SIMPLE_RCC_IOPENR_GPIOXEN_Pos(port);
     else
         RCC->IOPENR &= ~(1 << SIMPLE_RCC_IOPENR_GPIOXEN_Pos(port));
+
+    tmp = RCC->IOPENR;
+    (void)tmp;
 
     return;
 }
