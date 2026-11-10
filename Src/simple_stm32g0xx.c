@@ -9,7 +9,7 @@
 #define SIMPLE_GPIO_MODER_PUPDR_OSPEEDR_Pos(pin) ((pin) * 2)
 #define SIMPLE_GPIO_MODER_PUPDR_OSPEEDR_Msk(pin) ((uint32_t) (3U << ((pin) * 2)))
 
-#define SIMPLE_RCC_IOENR_GPIOXEN_Pos(port) ((port) - 'A')
+#define SIMPLE_RCC_IOPENR_GPIOXEN_Pos(port) ((port) - 'A')
 
 
 /* ------ */
@@ -337,21 +337,15 @@ simple_returnStatus simple_gpio_configure(simple_gpio_typeDef* gpiox, simple_gpi
     return simple_OK;
 }
 
-simple_returnStatus simple_gpio_portEnableDisable(uint8_t port, bool enable)
+void simple_gpio_portEnableDisable(uint8_t port, bool enable)
 {
     // STM32G031K8 only has GPIO ports A, B, C, D, and F
     assert((port >= 'A' && port <= 'D') || port == 'F');
 
     if (enable == true)
-    {
-        // TODO: enable respective port's peripheral clock
-        // RCC_IOPENR
-        // RCC_IOPSMENR
-        //
-        // 1. enable the GPIO port's clock via RCC_IOPENR
-        // 2. configure GPIO port through its GPIO_xxxx registers
+        RCC->IOPENR |= 1 << SIMPLE_RCC_IOPENR_GPIOXEN_Pos(port);
+    else
+        RCC->IOPENR &= ~(1 << SIMPLE_RCC_IOPENR_GPIOXEN_Pos(port));
 
-    }
-
-    return simple_OK;
+    return;
 }
