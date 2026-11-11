@@ -7,8 +7,21 @@
 #include <stdint.h>
 
 
-/* oscillators */
 #define SIMPLE_OSCILLATOR_LSESPEED          32768UL
+
+#define SIMPLE_IO_BASE                      0x40000000UL
+
+#define SIMPLE_GPIOA_BASE                   (SIMPLE_IO_BASE + 0x00000000UL)
+#define SIMPLE_GPIOB_BASE                   (SIMPLE_IO_BASE + 0x00000400UL)
+#define SIMPLE_GPIOC_BASE                   (SIMPLE_IO_BASE + 0x00000800UL)
+#define SIMPLE_GPIOD_BASE                   (SIMPLE_IO_BASE + 0x00000C00UL)
+#define SIMPLE_GPIOF_BASE                   (SIMPLE_IO_BASE + 0x00001400UL)
+
+#define SIMPLE_GPIOA                        ((simple_gpio_typeDef*) SIMPLE_GPIOA_BASE)
+#define SIMPLE_GPIOB                        ((simple_gpio_typeDef*) SIMPLE_GPIOB_BASE)
+#define SIMPLE_GPIOC                        ((simple_gpio_typeDef*) SIMPLE_GPIOC_BASE)
+#define SIMPLE_GPIOD                        ((simple_gpio_typeDef*) SIMPLE_GPIOD_BASE)
+#define SIMPLE_GPIOF                        ((simple_gpio_typeDef*) SIMPLE_GPIOF_BASE)
 
 
 /* available clocks */
