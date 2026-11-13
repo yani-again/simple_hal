@@ -362,3 +362,51 @@ void simple_gpio_portReset(uint8_t port)
 
     // TODO: resert port with RCC_IOPRSTR
 }
+
+
+/* exti */
+simple_returnStatus simple_exti_configure(simple_exti_config_t* config)
+{
+    assert(config->pin <= 16);
+    assert(((config->port >= 'A') && (config->port <= 'D')) || config->port == 'F');
+
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+
+    uint8_t port = config->port - 'A';
+    uint8_t pin = config->pin;
+    uint32_t tmp = 0;
+
+    // set port
+    tmp = SIMPLE_EXTI->EXTICR[pin >> 2U];
+    tmp &= ~SIMPLE_EXTI_EXTICR_Msk(pin);
+    tmp |= port << SIMPLE_EXTI_EXTICR_Pos(pin);
+    SIMPLE_EXTI->EXTICR[pin >> 2U] = tmp;
+
+    // set edge triggers
+    if (config->risingTrigger_enable == true)
+        SIMPLE_EXTI->RTSR1 |= 1U << config->pin;
+    else
+        SIMPLE_EXTI->RTSR1 &= ~(1U << config->pin);
+
+    if (config->fallingTrigger_enable == true)
+        SIMPLE_EXTI->FTSR1 |= 1U << config->pin;
+    else
+        SIMPLE_EXTI->FTSR1 &= ~(1U << config->pin);
+
+    // interrupts
+    if (config->interrupt_enable == true)
+        SIMPLE_EXTI->IMR1 |= 1U << pin;
+    else
+        SIMPLE_EXTI->IMR1 &= ~(1U << pin);
+
+    // events
+    if (config->event_enable == true)
+        SIMPLE_EXTI->EMR1 |= 1U << pin;
+    else
+        SIMPLE_EXTI->EMR1 &= ~(1U << pin);
+
+    __set_PRIMASK(primask);
+
+    return simple_OK;
+}

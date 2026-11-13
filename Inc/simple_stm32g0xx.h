@@ -2,14 +2,23 @@
 #define SIMPLE_STM32G0XX_H
 
 
+#ifndef STM32G031xx
+#error "STM32G031xx not defined"
+#endif
+
+
 #include "simple_generic.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <assert.h>
 
 
 #define SIMPLE_OSCILLATOR_LSESPEED          32768UL
 
-#define SIMPLE_IO_BASE                      0x40000000UL
+#define SIMPLE_PERI_BASE                    (0x40000000UL)
+#define SIMPLE_IO_BASE                      (0x40000000UL)
+
+#define SIMPLE_AHBPERI_BASE                 (SIMPLE_PERI_BASE + 0x00020000UL)
 
 #define SIMPLE_GPIOA_BASE                   (SIMPLE_IO_BASE + 0x00000000UL)
 #define SIMPLE_GPIOB_BASE                   (SIMPLE_IO_BASE + 0x00000400UL)
@@ -22,6 +31,11 @@
 #define SIMPLE_GPIOC                        ((simple_gpio_typeDef*) SIMPLE_GPIOC_BASE)
 #define SIMPLE_GPIOD                        ((simple_gpio_typeDef*) SIMPLE_GPIOD_BASE)
 #define SIMPLE_GPIOF                        ((simple_gpio_typeDef*) SIMPLE_GPIOF_BASE)
+
+#define SIMPLE_EXTI_BASE                    (SIMPLE_AHBPERI_BASE + 0x00001800UL)
+#define SIMPLE_EXTI                         ((simple_exti_typeDef*) SIMPLE_EXTI_BASE)
+#define SIMPLE_EXTI_EXTICR_Pos(line)        ((line % 4) * 8)
+#define SIMPLE_EXTI_EXTICR_Msk(line)        ((uint32_t) (0xFFU << (line % 4)))
 
 
 /* available clocks */
@@ -104,18 +118,44 @@ typedef struct
 
 typedef struct
 {
-  uint32_t MODER;
-  uint32_t OTYPER;
-  uint32_t OSPEEDR;
-  uint32_t PUPDR;
-  uint32_t IDR;
-  uint32_t ODR;
-  uint32_t BSRR;
-  uint32_t LCKR;
-  uint32_t AFRL;
-  uint32_t AFRH;
-  uint32_t BRR;
+    uint32_t MODER;
+    uint32_t OTYPER;
+    uint32_t OSPEEDR;
+    uint32_t PUPDR;
+    uint32_t IDR;
+    uint32_t ODR;
+    uint32_t BSRR;
+    uint32_t LCKR;
+    uint32_t AFRL;
+    uint32_t AFRH;
+    uint32_t BRR;
 } simple_gpio_typeDef;
+
+
+/* EXTI */
+typedef struct
+{
+    volatile uint32_t RTSR1;
+    volatile uint32_t FTSR1;
+    volatile uint32_t SWIER1;
+    volatile uint32_t RPR1;
+    volatile uint32_t FPR1;
+             uint32_t RESERVED1[19];
+    volatile uint32_t EXTICR[4];
+             uint32_t RESERVED4[4];
+    volatile uint32_t IMR1;
+    volatile uint32_t EMR1;
+} simple_exti_typeDef;
+
+typedef struct
+{
+    uint8_t pin;
+    uint8_t port;
+    bool risingTrigger_enable;
+    bool fallingTrigger_enable;
+    bool interrupt_enable;
+    bool event_enable;
+} simple_exti_config_t;
 
 
 /* clock functions */
@@ -131,6 +171,9 @@ void simple_rtc_getTime(simple_rtc_currentTime*);
 simple_returnStatus simple_gpio_configure(simple_gpio_typeDef*, simple_gpio_config_t*);
 void simple_gpio_portEnableDisable(uint8_t, bool);
 void simple_gpio_portReset(uint8_t);
+
+/* EXTI functions */
+simple_returnStatus simple_exti_configure(simple_exti_config_t* config);
 
 
 #endif
